@@ -1,0 +1,65 @@
+I have a created a cluster in Google Kubernetes Engine.
+
+And created the configuration of
+	3 worker nodes ( each with 4 vCPUs, 15 GB memory and 100 GB Boot Disk Size)
+	
+In the cluster, I have done a blockchain-network setup.
+
+Now, I have deployed a node-application in the pods in the cluster. My node-app involves about 5 services (so deployed in 5 pods)
+
+worker node 1 consists of about 31 pods, worker node 2 consists of about 29 pods and 3rd worker node with 19 pods.
+
+For each network components I have created pv, pvc of about 3Gi, 2Gi and 1Gi based on the requirements.
+
+For node-app,
+	I have deployed mongodb in one pod - For mongodb created pv, pvc of about 200 Gi
+	And my node-app includes 4 other services which has pv,pvc of about 7 Gi
+	
+Now, I have checked the resource summary in 3 worker nodes:
+
+WORKER NODE-1:
+
+CPU 	                  4 CPU 	3.92 CPU 	425 mCPU
+Ephemeral storage 	103.88 GB 	49.47 GB 	0 B
+GCE volume limit 	127 	            127 	0
+GPU 	                  0 GPU 	0 GPU 	        0 GPU
+Huge pages 1Gi 	          0 B 	        0 B 	        0 B
+Huge pages 2Mi 	0 B 	0 B 	0 B
+Memory 	15.76 GB 	13 GB 	693.7 MB
+Pods 	110 	110 	0
+Storage 	0 B 	0 B 	0 B
+
+
+WORKER NODE -2:
+
+CPU 	4 CPU 	3.92 CPU 	461 mCPU
+Ephemeral storage 	103.88 GB 	49.47 GB 	0 B
+GCE volume limit 	127 	127 	0
+GPU 	0 GPU 	0 GPU 	0 GPU
+Huge pages 1Gi 	0 B 	0 B 	0 B
+Huge pages 2Mi 	0 B 	0 B 	0 B
+Memory 	15.76 GB 	13 GB 	346.03 MB
+Pods 	110 	110 	0
+Storage 	0 B 	0 B 	0 B
+
+
+
+WORKER NODE - 3: 
+
+CPU 	4 CPU 	3.92 CPU 	1.47 CPU
+Ephemeral storage 	103.88 GB 	49.47 GB 	0 B
+GCE volume limit 	127 	127 	0
+GPU 	0 GPU 	0 GPU 	0 GPU
+Huge pages 1Gi 	0 B 	0 B 	0 B
+Huge pages 2Mi 	0 B 	0 B 	0 B
+Memory 	15.76 GB 	13 GB 	2.51 GB
+Pods 	110 	110 	0
+Storage 	0 B 	0 B 	0 B
+
+
+
+Can you please ellaborate how ephemeral storage and pv, pvc are connected. Do pv takes GB from worker node boot disk?
+
+
+
+
