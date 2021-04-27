@@ -1,0 +1,464 @@
+---
+# This is a sample configuration file for SupplyChain App which has 5 nodes.
+network:
+  # Network level configuration specifies the attributes required for each organization
+  # to join an existing network.
+  type: fabric
+  version: 2.2.0                 # currently tested 1.4.8 and 2.2.0
+
+  frontend: enabled #Flag for frontend to enabled for nodes/peers
+
+  #Environment section for Kubernetes setup
+  env:
+    type: "dev"              # tag for the environment. Important to run multiple flux on single cluster
+    proxy: haproxy                  # values can be 'haproxy' or 'none'
+    ambassadorPorts: 15010,15020    # Any additional Ambassador ports can be given here, must be comma-separated without spaces, this is valid only if proxy='ambassador'
+    loadBalancerSourceRanges: # (Optional) Default value is '0.0.0.0/0', this value can be changed to any other IP adres or list (comma-separated without spaces) of IP adresses, this is valid only if proxy='ambassador'
+    retry_count: 20                 # Retry count for the checks
+    external_dns: enabled           # Should be enabled if using external-dns for automatic route configuration
+
+  # Docker registry details where images are stored. This will be used to create k8s secrets
+  # Please ensure all required images are built and stored in this registry.
+  # Do not check-in docker_password.
+  docker:
+    url: "index.docker.io/hyperledgerlabs"
+    username: "docker_username"
+    password: "docker_password"
+  
+  # Remote connection information for orderer (will be blank or removed for orderer hosting organization)
+  # For RAFT consensus, have odd number (2n+1) of orderers for consensus agreement to have a majority.
+  orderers:
+    - orderer:
+      type: orderer
+      name: orderer1
+      org_name: ordorg               #org_name should match one organization definition below in organizations: key            
+      uri: orderer1.ordorg-net.test.cluster-context.xyz.com:8443   # Can be external or internal URI for orderer which should be reachable by all peers
+      certificate: /home/blockchain-automation-framework/build/orderer1.crt           # Ensure that the directory exists
+    - orderer:
+      type: orderer
+      name: orderer2
+      org_name: ordorg               #org_name should match one organization definition below in organizations: key            
+      uri: orderer2.ordorg-net.test.cluster-context.xyz.com:8443   # Can be external or internal URI for orderer which should be reachable by all peers
+      certificate: /home/blockchain-automation-framework/build/orderer2.crt           # Ensure that the directory exists
+    - orderer:
+      type: orderer
+      name: orderer3
+      org_name: ordorg               #org_name should match one organization definition below in organizations: key            
+      uri: orderer3.ordorg-net.test.cluster-context.xyz.com:8443   # Can be external or internal URI for orderer which should be reachable by all peers
+      certificate: /home/blockchain-automation-framework/build/orderer3.crt           # Ensure that the directory exists
+    
+  
+  channels:
+  - channel:
+    consortium: TestConsortium
+    channel_name: TestChannel
+    orderer: 
+      name: ordorg
+    participants:
+    - organization:
+      name: org1
+      type: creator       # creator organization will create the channel and instantiate chaincode, in addition to joining the channel and install chaincode
+      org_status: new
+      peers:
+      - peer:
+        name: peer0
+        gossipAddress: peer0.org1-net.test.cluster-context.xyz.com:8443  # External or internal URI of the gossip peer
+        peerAddress: peer0.org1-net.test.cluster-context.xyz.com:8443 # External URI of the peer
+      ordererAddress: orderer1.ordorg-net.test.cluster-context.xyz.com:8443             # External or internal URI of the orderer
+    - organization:
+      name: org2
+      type: joiner       # joiner organization will join the channel 
+      org_status: new
+      peers:
+      - peer:
+        name: peer0
+        gossipAddress: peer0.org2-net.test.cluster-context.xyz.com:8443  # External or internal URI of the gossip peer
+        peerAddress: peer0.org2-net.test.cluster-context.xyz.com:8443 # External URI of the peer
+      ordererAddress: orderer1.ordorg-net.test.cluster-context.xyz.com:8443             # External or internal URI of the orderer
+    - organization:
+      name: org3
+      type: joiner       # joiner organization will join the channel 
+      org_status: new
+      peers:
+      - peer:
+        name: peer0
+        gossipAddress: peer0.org3-net.test.fourthcluster.xyz.com:8443  # External or internal URI of the gossip peer
+        peerAddress: peer0.org3-net.test.fourthcluster.xyz.com:8443 # External URI of the peer
+      ordererAddress: orderer1.ordorg-net.test.cluster-context.xyz.com:8443             # External or internal URI of the orderer
+    endorsers:
+      name:
+      - org1
+      - org2
+      - org3
+      corepeerAddress:
+      - peer0.org1-net.test.cluster-context.xyz.com:8443
+      - peer0.org2-net.test.cluster-context.xyz.com:8443
+      - peer0.org3-net.test.fourthcluster.xyz.com:8443
+    genesis:
+      name: TestChannelGenesis
+  
+
+  # Allows specification of one or many organizations that will be connecting to a network.
+  # If an organization is also hosting the root of the network (e.g. doorman, membership service, etc),
+  # then these services should be listed in this section as well.
+  organizations:
+
+    # Specification for the 1st organization. Each organization maps to a VPC and a separate k8s cluster
+    - organization:
+      name: ordorg
+      country: UK
+      state: London
+      location: London
+      subject: "O=Orderer,L=51.50/-0.13/London,C=GB"
+      type: orderer
+      external_url_suffix: ordorg-net.test.cluster-context.xyz.com
+      org_status: new
+      ca_data:
+        url: ca.ordorg-net:7054
+        certificate: file/server.crt        # This has not been implemented in 0.2.0.0
+  
+      cloud_provider: azure   # Options: aws, azure, gcp, digitalocean, minikube
+      aws:
+        access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
+        secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws
+  
+      # Kubernetes cluster deployment variables. The config file path and name has to be provided in case
+      # the cluster has already been created.
+      k8s:
+        region: "cluster-region"
+        context: "cluster-context"
+        config_file: "cluster-config-file"
+
+      # Hashicorp Vault server address and root-token. Vault should be unsealed.
+      # Do not check-in root_token
+      vault:
+        url: "vault-addr"
+        root_token: "vault-token"
+        
+      # Git Repo details which will be used by GitOps/Flux.
+      # Do not check-in git_access_token
+      gitops:
+        git_protocol: "ssh"
+        git_url: "git@github.com:gituser/blockchain-automation-framework.git"         # Gitops ssh url for flux value files 
+        branch: "multicluster"           # Git branch where release is being made
+        release_dir: "platforms/hyperledger-fabric/releases/ordorg-net" # Relative Path in the Git repo for flux sync per environment. 
+        chart_source: "platforms/hyperledger-fabric/charts"     # Relative Path where the Helm charts are stored in Git repo
+        git_repo: "github.com/gituser/blockchain-automation-framework.git"   # Gitops https URL for git push  (without https://)
+        username: "gituser"          # Git Service user who has rights to check-in in all branches
+        password: "gitpwd"          # Git Server user password
+        email: "gitmail"                # Email to use in git config
+        private_key: "gitops-pvt-key"          # Path to private key file which has write-access to the git repo
+     
+      # Services maps to the pods that will be deployed on the k8s cluster
+      # This sample is an orderer service and includes a zk-kafka consensus
+      services:
+        ca:
+          name: ca
+          subject: "/C=GB/ST=London/L=London/O=Orderer/CN=ca.ordorg-net"
+          type: ca
+          grpc:
+            port: 7054
+        
+        consensus:
+          name: raft
+          type: broker        #This field is not consumed for raft consensus
+          replicas: 4         #This field is not consumed for raft consensus
+          grpc:
+            port: 9092        #This field is not consumed for raft consensus
+                
+        orderers:
+        # This sample has multiple orderers as an example.
+        # You can use a single orderer for most production implementations.
+        # For RAFT consensus, have odd number (2n+1) of orderers for consensus agreement to have a majority.
+        - orderer:
+          name: orderer1
+          type: orderer
+          consensus: raft
+          grpc:
+            port: 7050
+        - orderer:
+          name: orderer2
+          type: orderer
+          consensus: raft
+          grpc:
+            port: 7050
+        - orderer:
+          name: orderer3
+          type: orderer
+          consensus: raft
+          grpc:
+            port: 7050
+        
+        
+
+    # Specification for the 2nd organization. Each organization maps to a VPC and a separate k8s cluster
+    - organization:
+      name: org1
+      country: CH
+      state: Zurich
+      location: Zurich
+      subject: "O=Org1,OU=Org1,L=47.38/8.54/Zurich,C=CH"
+      type: peer
+      external_url_suffix: test.cluster-context.xyz.com
+      org_status: new
+      ca_data:
+        url: ca.org1-net:7054
+        certificate: file/server.crt
+
+      cloud_provider: azure   # Options: aws, azure, gcp, digitalocean, minikube
+      aws:
+        access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
+        secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws
+  
+      # Kubernetes cluster deployment variables. The config file path and name has to be provided in case
+      # the cluster has already been created.
+      
+      k8s:
+        region: "cluster-region"
+        context: "cluster-context"
+        config_file: "cluster-config-file"
+
+      # Hashicorp Vault server address and root-token. Vault should be unsealed.
+      # Do not check-in root_token
+      vault:
+        url: "vault-addr"
+        root_token: "vault-token"
+      
+      # Git Repo details which will be used by GitOps/Flux.
+      # Do not check-in git_access_token
+      gitops:
+        git_protocol: "ssh"
+        git_url: "git@github.com:gituser/blockchain-automation-framework.git"         # Gitops ssh url for flux value files 
+        branch: "multicluster"           # Git branch where release is being made
+        release_dir: "platforms/hyperledger-fabric/releases/org1-net" # Relative Path in the Git repo for flux sync per environment. 
+        chart_source: "platforms/hyperledger-fabric/charts"     # Relative Path where the Helm charts are stored in Git repo
+        git_repo: "github.com/gituser/blockchain-automation-framework.git"   # Gitops https URL for git push  (without https://)
+        username: "gituser"          # Git Service user who has rights to check-in in all branches
+        password: "gitpwd"          # Git Server user password
+        email: "gitmail"                # Email to use in git config
+        private_key: "gitops-pvt-key"          # Path to private key file which has write-access to the git repo
+
+      # The participating nodes are peers
+      # This organization hosts it's own CA server
+      services:
+        ca:
+          name: ca
+          subject: "/C=CH/ST=Zurich/L=Zurich/O=Org1/CN=ca.org1-net"
+          type: ca
+          grpc:
+            port: 7054
+        peers:
+        - peer:
+          name: peer0          
+          type: anchor    # This can be anchor/nonanchor. Atleast one peer should be anchor peer.         
+          gossippeeraddress: peer0.org1-net:7051 # Internal Address of the other peer in same Org for gossip, same peer if there is only one peer 
+          peerAddress: peer0.org1-net.test.cluster-context.xyz.com:8443 # External URI of the peer 
+          certificate: "/path/ca.crt" # certificate path for peer
+          cli: enabled      # Creates a peer cli pod depending upon the (enabled/disabled) tag.   
+          grpc:
+            port: 7051         
+          events:
+            port: 7053
+          couchdb:
+            port: 5984
+          restserver:           # This is for the rest-api server
+            targetPort: 20001
+            port: 20001 
+          expressapi:           # This is for the express api server
+            targetPort: 3000
+            port: 3000
+          chaincode:
+            name: "fabcar" #This has to be replaced with the name of the chaincode
+            version: "1" #This has to be replaced with the version of the chaincode
+            maindirectory: "fabric-sample/chaincode"  #The main directory where chaincode is needed to be placed
+            lang: "golang"  # The language in which the chaincode is written ( golang/java/node )
+            repository:
+              username: "gituser"          # Git Service user who has rights to check-in in all branches
+              password: "gitpwd"
+              url: "github.com/gituser/fabric-samples.git"
+              branch: develop
+              path: "fabcar/go/"   #The path to the chaincode 
+            arguments: '{Make: "Toyota", Model: "Prius", Colour: "blue", Owner: "Tomoko"}' #Arguments to be passed along with the chaincode parameters
+            endorsements: "" #Endorsements (if any) provided along with the chaincode
+            
+            
+    - organization:
+      name: org2
+      country: CH
+      state: Zurich
+      location: Zurich
+      subject: "O=Org2,OU=Org2,L=47.38/8.54/Zurich,C=CH"
+      type: peer
+      external_url_suffix: test.cluster-context.xyz.com
+      org_status: new
+      ca_data:
+        url: ca.org2-net:7054
+        certificate: file/server.crt
+
+      cloud_provider: azure   # Options: aws, azure, gcp, digitalocean, minikube
+      aws:
+        access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
+        secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws
+  
+      # Kubernetes cluster deployment variables. The config file path and name has to be provided in case
+      # the cluster has already been created.
+      
+      k8s:
+        region: "cluster-region"
+        context: "cluster-context"
+        config_file: "cluster-config-file"
+
+      # Hashicorp Vault server address and root-token. Vault should be unsealed.
+      # Do not check-in root_token
+      vault:
+        url: "vault-addr"
+        root_token: "vault-token"
+      
+      # Git Repo details which will be used by GitOps/Flux.
+      # Do not check-in git_access_token
+      gitops:
+        git_protocol: "ssh"
+        git_url: "git@github.com:gituser/blockchain-automation-framework.git"         # Gitops ssh url for flux value files 
+        branch: "multicluster"           # Git branch where release is being made
+        release_dir: "platforms/hyperledger-fabric/releases/org2-net" # Relative Path in the Git repo for flux sync per environment. 
+        chart_source: "platforms/hyperledger-fabric/charts"     # Relative Path where the Helm charts are stored in Git repo
+        git_repo: "github.com/gituser/blockchain-automation-framework.git"   # Gitops https URL for git push  (without https://)
+        username: "gituser"          # Git Service user who has rights to check-in in all branches
+        password: "gitpwd"          # Git Server user password
+        email: "gitmail"                # Email to use in git config
+        private_key: "gitops-pvt-key"          # Path to private key file which has write-access to the git repo
+
+      # The participating nodes are peers
+      # This organization hosts it's own CA server
+      services:
+        ca:
+          name: ca
+          subject: "/C=CH/ST=Zurich/L=Zurich/O=Org2/CN=ca.org2-net"
+          type: ca
+          grpc:
+            port: 7054
+        peers:
+        - peer:
+          name: peer0          
+          type: anchor    # This can be anchor/nonanchor. Atleast one peer should be anchor peer.         
+          gossippeeraddress: peer0.org2-net:7051 # Internal Address of the other peer in same Org for gossip, same peer if there is only one peer 
+          peerAddress: peer0.org2-net.test.cluster-context.xyz.com:8443 # External URI of the peer 
+          certificate: "/path/ca.crt" # certificate path for peer
+          cli: enabled      # Creates a peer cli pod depending upon the (enabled/disabled) tag.   
+          grpc:
+            port: 7051         
+          events:
+            port: 7053
+          couchdb:
+            port: 5984
+          restserver:           # This is for the rest-api server
+            targetPort: 20001
+            port: 20001 
+          expressapi:           # This is for the express api server
+            targetPort: 3000
+            port: 3000
+          chaincode:
+            name: "fabcar" #This has to be replaced with the name of the chaincode
+            version: "1" #This has to be replaced with the version of the chaincode
+            maindirectory: "fabric-sample/chaincode"  #The main directory where chaincode is needed to be placed
+            lang: "golang"  # The language in which the chaincode is written ( golang/java/node )
+            repository:
+              username: "gituser"          # Git Service user who has rights to check-in in all branches
+              password: "gitpwd"
+              url: "github.com/gituser/fabric-samples.git"
+              branch: develop
+              path: "fabcar/go/"   #The path to the chaincode 
+            arguments: '{Make: "Toyota", Model: "Prius", Colour: "blue", Owner: "Tomoko"}' #Arguments to be passed along with the chaincode parameters
+            endorsements: "" #Endorsements (if any) provided along with the chaincode
+  
+  
+    - organization:
+      name: org3
+      country: CH
+      state: Zurich
+      location: Zurich
+      subject: "O=Org3,OU=Org3,L=47.38/8.54/Zurich,C=CH"
+      type: peer
+      external_url_suffix: test.fourthcluster.xyz.com
+      org_status: new
+      ca_data:
+        url: ca.org3-net:7054
+        certificate: file/server.crt
+
+      cloud_provider: azure   # Options: aws, azure, gcp, digitalocean, minikube
+      aws:
+        access_key: "aws_access_key"        # AWS Access key, only used when cloud_provider=aws
+        secret_key: "aws_secret_key"        # AWS Secret key, only used when cloud_provider=aws
+  
+      # Kubernetes cluster deployment variables. The config file path and name has to be provided in case
+      # the cluster has already been created.
+      
+      k8s:
+        region: "cluster-region"
+        context: "fourthcluster"
+        config_file: "/home/blockchain-automation-framework/build/fourthclusterconfig"
+
+      # Hashicorp Vault server address and root-token. Vault should be unsealed.
+      # Do not check-in root_token
+      vault:
+        url: "vault-addr"
+        root_token: "vault-token"
+      
+      # Git Repo details which will be used by GitOps/Flux.
+      # Do not check-in git_access_token
+      gitops:
+        git_protocol: "ssh"
+        git_url: "git@github.com:gituser/blockchain-automation-framework.git"         # Gitops ssh url for flux value files 
+        branch: "multicluster"           # Git branch where release is being made
+        release_dir: "platforms/hyperledger-fabric/releases/org3-net" # Relative Path in the Git repo for flux sync per environment. 
+        chart_source: "platforms/hyperledger-fabric/charts"     # Relative Path where the Helm charts are stored in Git repo
+        git_repo: "github.com/gituser/blockchain-automation-framework.git"   # Gitops https URL for git push  (without https://)
+        username: "gituser"          # Git Service user who has rights to check-in in all branches
+        password: "gitpwd"          # Git Server user password
+        email: "gitmail"                # Email to use in git config
+        private_key: "gitops-pvt-key"          # Path to private key file which has write-access to the git repo
+
+      # The participating nodes are peers
+      # This organization hosts it's own CA server
+      services:
+        ca:
+          name: ca
+          subject: "/C=CH/ST=Zurich/L=Zurich/O=Org3/CN=ca.org3-net"
+          type: ca
+          grpc:
+            port: 7054
+        peers:
+        - peer:
+          name: peer0          
+          type: anchor    # This can be anchor/nonanchor. Atleast one peer should be anchor peer.         
+          gossippeeraddress: peer0.org3-net:7051 # Internal Address of the other peer in same Org for gossip, same peer if there is only one peer 
+          peerAddress: peer0.org3-net.test.fourthcluster.xyz.com:8443 # External URI of the peer 
+          certificate: "/path/ca.crt" # certificate path for peer
+          cli: enabled      # Creates a peer cli pod depending upon the (enabled/disabled) tag.   
+          grpc:
+            port: 7051         
+          events:
+            port: 7053
+          couchdb:
+            port: 5984
+          restserver:           # This is for the rest-api server
+            targetPort: 20001
+            port: 20001 
+          expressapi:           # This is for the express api server
+            targetPort: 3000
+            port: 3000
+          chaincode:
+            name: "fabcar" #This has to be replaced with the name of the chaincode
+            version: "1" #This has to be replaced with the version of the chaincode
+            maindirectory: "fabric-sample/chaincode"  #The main directory where chaincode is needed to be placed
+            lang: "golang"  # The language in which the chaincode is written ( golang/java/node )
+            repository:
+              username: "gituser"          # Git Service user who has rights to check-in in all branches
+              password: "gitpwd"
+              url: "github.com/gituser/fabric-samples.git"
+              branch: develop
+              path: "fabcar/go/"   #The path to the chaincode 
+            arguments: '{Make: "Toyota", Model: "Prius", Colour: "blue", Owner: "Tomoko"}' #Arguments to be passed along with the chaincode parameters
+            endorsements: "" #Endorsements (if any) provided along with the chaincode
+  
+  
