@@ -1,0 +1,64 @@
+2021-05-10 07:41:16.473 UTC [nodeCmd] serve -> INFO 001 Starting peer:
+ Version: 2.2.0
+ Commit SHA: 5ea85bc
+ Go version: go1.14.4
+ OS/Arch: linux/amd64
+ Chaincode:
+  Base Docker Label: org.hyperledger.fabric
+  Docker Namespace: hyperledger
+2021-05-10 07:41:16.474 UTC [peer] getLocalAddress -> INFO 002 Auto-detected peer address: 192.168.80.3:9051
+2021-05-10 07:41:16.475 UTC [peer] getLocalAddress -> INFO 003 Returning peer0.org2.example.com:9051
+2021-05-10 07:41:16.525 UTC [nodeCmd] initGrpcSemaphores -> INFO 004 concurrency limit for endorser service is 2500
+2021-05-10 07:41:16.525 UTC [nodeCmd] initGrpcSemaphores -> INFO 005 concurrency limit for deliver service is 2500
+2021-05-10 07:41:16.525 UTC [nodeCmd] serve -> INFO 006 Starting peer with TLS enabled
+2021-05-10 07:41:16.842 UTC [ledgermgmt] NewLedgerMgr -> INFO 007 Initializing LedgerMgr
+2021-05-10 07:41:20.841 UTC [ledgermgmt] NewLedgerMgr -> INFO 008 Initialized LedgerMgr
+2021-05-10 07:41:20.873 UTC [gossip.service] New -> INFO 009 Initialize gossip with endpoint peer0.org2.example.com:9051
+2021-05-10 07:41:20.897 UTC [gossip.gossip] New -> INFO 00a Creating gossip service with self membership of Endpoint: peer0.org2.example.com:9051, InternalEndpoint: peer0.org2.example.com:9051, PKI-ID: 847e6e22da6fedac67f91b9904b8a739cfaadead2c1e86e211669685b804ed34, Metadata: 
+2021-05-10 07:41:20.898 UTC [gossip.gossip] start -> INFO 00b Gossip instance peer0.org2.example.com:9051 started
+2021-05-10 07:41:21.046 UTC [lifecycle] InitializeLocalChaincodes -> INFO 00c Initialized lifecycle cache with 1 already installed chaincodes
+2021-05-10 07:41:21.047 UTC [nodeCmd] computeChaincodeEndpoint -> INFO 00d Entering computeChaincodeEndpoint with peerHostname: peer0.org2.example.com
+2021-05-10 07:41:21.047 UTC [nodeCmd] computeChaincodeEndpoint -> INFO 00e Exit with ccEndpoint: peer0.org2.example.com:9052
+2021-05-10 07:41:21.054 UTC [sccapi] DeploySysCC -> INFO 00f deploying system chaincode 'lscc'
+2021-05-10 07:41:21.054 UTC [sccapi] DeploySysCC -> INFO 010 deploying system chaincode 'cscc'
+2021-05-10 07:41:21.054 UTC [sccapi] DeploySysCC -> INFO 011 deploying system chaincode 'qscc'
+2021-05-10 07:41:21.055 UTC [sccapi] DeploySysCC -> INFO 012 deploying system chaincode '_lifecycle'
+2021-05-10 07:41:21.055 UTC [nodeCmd] serve -> INFO 013 Deployed system chaincodes
+2021-05-10 07:41:21.055 UTC [peer] Initialize -> INFO 014 Loading chain mychannel
+2021-05-10 07:41:21.055 UTC [ledgermgmt] OpenLedger -> INFO 015 Opening ledger with id = mychannel
+2021-05-10 07:41:21.200 UTC [lifecycle] update -> INFO 016 Updating cached definition for chaincode 'basic' on channel 'mychannel'
+2021-05-10 07:41:21.201 UTC [lifecycle] update -> INFO 017 Chaincode with package ID 'basic_1.0:4ec191e793b27e953ff2ede5a8bcc63152cecb1e4c3f301a26e22692c61967ad' now available on channel mychannel for chaincode definition basic:1.0
+2021-05-10 07:41:21.406 UTC [ledgermgmt] OpenLedger -> INFO 018 Opened ledger with id = mychannel
+2021-05-10 07:41:21.414 UTC [peer.orderers] Update -> WARN 019 Config defines both orderer org specific endpoints and global endpoints, global endpoints will be ignored channel=mychannel
+2021-05-10 07:41:21.414 UTC [gossip.gossip] JoinChan -> INFO 01a Joining gossip network of channel mychannel with 2 organizations
+2021-05-10 07:41:21.414 UTC [gossip.gossip] learnAnchorPeers -> INFO 01b Learning about the configured anchor peers of Org1MSP for channel mychannel : [{peer0.org1.example.com 7051}]
+2021-05-10 07:41:21.414 UTC [gossip.gossip] learnAnchorPeers -> INFO 01c Learning about the configured anchor peers of Org2MSP for channel mychannel : [{peer0.org2.example.com 9051}]
+2021-05-10 07:41:21.414 UTC [gossip.gossip] learnAnchorPeers -> INFO 01d Anchor peer with same endpoint, skipping connecting to myself
+2021-05-10 07:41:21.418 UTC [gossip.state] NewGossipStateProvider -> INFO 01e Updating metadata information for channel mychannel, current ledger sequence is at = 7, next expected block is = 8
+2021-05-10 07:41:21.419 UTC [deliveryClient] StartDeliverForChannel -> INFO 01f This peer will retrieve blocks from ordering service and disseminate to other peers in the organization for channel mychannel
+2021-05-10 07:41:21.419 UTC [discovery] NewService -> INFO 020 Created with config TLS: true, authCacheMaxSize: 1000, authCachePurgeRatio: 0.750000
+2021-05-10 07:41:21.419 UTC [nodeCmd] registerDiscoveryService -> INFO 021 Discovery service activated
+2021-05-10 07:41:21.419 UTC [nodeCmd] serve -> INFO 022 Starting peer with ID=[peer0.org2.example.com], network ID=[dev], address=[peer0.org2.example.com:9051]
+2021-05-10 07:41:21.419 UTC [nodeCmd] serve -> INFO 023 Started peer with ID=[peer0.org2.example.com], network ID=[dev], address=[peer0.org2.example.com:9051]
+2021-05-10 07:41:21.419 UTC [nodeCmd] func6 -> INFO 024 Starting profiling server with listenAddress = 0.0.0.0:6060
+2021-05-10 07:41:21.420 UTC [kvledger] LoadPreResetHeight -> INFO 025 Loading prereset height from path [/var/hyperledger/production/ledgersData/chains]
+2021-05-10 07:41:21.478 UTC [peer.blocksprovider] DeliverBlocks -> WARN 027 Got error while attempting to receive blocks: received bad status SERVICE_UNAVAILABLE from orderer channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:21.478 UTC [peer.blocksprovider] func1 -> WARN 026 Encountered an error reading from deliver stream: EOF channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:21.589 UTC [peer.blocksprovider] func1 -> WARN 028 Encountered an error reading from deliver stream: EOF channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:21.589 UTC [peer.blocksprovider] DeliverBlocks -> WARN 029 Got error while attempting to receive blocks: received bad status SERVICE_UNAVAILABLE from orderer channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:21.722 UTC [peer.blocksprovider] func1 -> WARN 02a Encountered an error reading from deliver stream: EOF channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:21.722 UTC [peer.blocksprovider] DeliverBlocks -> WARN 02b Got error while attempting to receive blocks: received bad status SERVICE_UNAVAILABLE from orderer channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:21.870 UTC [peer.blocksprovider] func1 -> WARN 02c Encountered an error reading from deliver stream: EOF channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:21.870 UTC [peer.blocksprovider] DeliverBlocks -> WARN 02d Got error while attempting to receive blocks: received bad status SERVICE_UNAVAILABLE from orderer channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:22.051 UTC [peer.blocksprovider] func1 -> WARN 02e Encountered an error reading from deliver stream: EOF channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:22.051 UTC [peer.blocksprovider] DeliverBlocks -> WARN 02f Got error while attempting to receive blocks: received bad status SERVICE_UNAVAILABLE from orderer channel=mychannel orderer-address=orderer.example.com:7050
+2021-05-10 07:41:24.416 UTC [gossip.gossip] func1 -> WARN 030 Deep probe of peer0.org1.example.com:7051 failed: context deadline exceeded
+2021-05-10 07:41:24.416 UTC [gossip.discovery] func1 -> WARN 031 Could not connect to Endpoint: peer0.org1.example.com:7051, InternalEndpoint: peer0.org1.example.com:7051, PKI-ID: <nil>, Metadata:  : context deadline exceeded
+2021-05-10 07:41:25.996 UTC [comm.grpc.server] 1 -> INFO 032 unary call completed grpc.service=gossip.Gossip grpc.method=Ping grpc.request_deadline=2021-05-10T07:41:27.995Z grpc.peer_address=192.168.80.4:58920 grpc.peer_subject="CN=peer0.org1.example.com,L=San Francisco,ST=California,C=US" grpc.code=OK grpc.call_duration=225.141µs
+2021-05-10 07:41:26.009 UTC [gossip.comm] GossipStream -> INFO 033 Peer c057e8d6e052550b7e303c4ad67b6280c97772b108291a756d188b51f5f973c7 (192.168.80.4:58920) probed us
+2021-05-10 07:41:26.010 UTC [comm.grpc.server] 1 -> INFO 034 streaming call completed grpc.service=gossip.Gossip grpc.method=GossipStream grpc.request_deadline=2021-05-10T07:41:36Z grpc.peer_address=192.168.80.4:58920 grpc.peer_subject="CN=peer0.org1.example.com,L=San Francisco,ST=California,C=US" grpc.code=OK grpc.call_duration=9.184083ms
+2021-05-10 07:41:26.017 UTC [comm.grpc.server] 1 -> INFO 035 unary call completed grpc.service=gossip.Gossip grpc.method=Ping grpc.request_deadline=2021-05-10T07:41:28.017Z grpc.peer_address=192.168.80.4:58924 grpc.peer_subject="CN=peer0.org1.example.com,L=San Francisco,ST=California,C=US" grpc.code=OK grpc.call_duration=77.88µs
+2021-05-10 07:41:31.415 UTC [gossip.channel] reportMembershipChanges -> INFO 036 [[mychannel] Membership view has changed. peers went online:  [[peer0.org1.example.com:7051 ]] , current view:  [[peer0.org1.example.com:7051 ]]]
+2021-05-10 07:42:18.327 UTC [dockercontroller] Start -> ERRO 037 start-could not start container: API error (404): network net_test not found
+2021-05-10 07:42:18.348 UTC [lifecycle] Work -> WARN 038 could not launch chaincode 'basic_1.0:4ec191e793b27e953ff2ede5a8bcc63152cecb1e4c3f301a26e22692c61967ad': error starting container: error starting container: API error (404): network net_test not found
+
